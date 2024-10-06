@@ -11,9 +11,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -37,4 +37,10 @@ jobs:
     - name: Build Docker image
       run: |
         docker build -t todo-app .
+
+    - name: Deploy to EC2
+      run: |
+        scp -i /home/vitalik/Стільниця/my-key-pair.pem app.py Dockerfile ubuntu@54.227.128.6:/home/ubuntu/ToDo_list/
+        ssh -i /home/vitalik/Стільниця/my-key-pair.pem ubuntu@54.227.128.6 "cd /home/ubuntu/ToDo_list/ && docker stop $(docker ps -q) || true && docker build -t todo-app . && docker run -d -p 80:5000 todo-app"
+
 
