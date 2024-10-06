@@ -44,9 +44,8 @@ jobs:
       run: |
         echo "${EC2_KEY}" > ec2_key.pem
         chmod 400 ec2_key.pem
+        mkdir -p ~/.ssh
         ssh-keyscan -H 54.227.128.6 >> ~/.ssh/known_hosts
         scp -i ec2_key.pem app.py Dockerfile ubuntu@54.227.128.6:/home/ubuntu/ToDo_list/
         ssh -i ec2_key.pem ubuntu@54.227.128.6 "cd /home/ubuntu/ToDo_list/ && docker stop $(docker ps -q) || true && docker build -t todo-app . && docker run -d -p 80:5000 todo-app"
-
-
-
+  
