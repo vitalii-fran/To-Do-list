@@ -39,8 +39,13 @@ jobs:
         docker build -t todo-app .
 
     - name: Deploy to EC2
+      env:
+        EC2_KEY: ${{ secrets.EC2_KEY_PAIR }}
       run: |
-        scp -i /home/vitalik/Стільниця/my-key-pair.pem app.py Dockerfile ubuntu@54.227.128.6:/home/ubuntu/ToDo_list/
-        ssh -i /home/vitalik/Стільниця/my-key-pair.pem ubuntu@54.227.128.6 "cd /home/ubuntu/ToDo_list/ && docker stop $(docker ps -q) || true && docker build -t todo-app . && docker run -d -p 80:5000 todo-app"
+        echo "${EC2_KEY}" > ec2_key.pem
+        chmod 400 ec2_key.pem
+        scp -i ec2_key.pem app.py Dockerfile ubuntu@54.227.128.6:/home/ubuntu/ToDo_list/
+        ssh -i ec2_key.pem ubuntu@54.227.128.6 "cd /home/ubuntu/ToDo_list/ && docker stop $(docker ps -q) || true && docker build -t todo-app . && docker run -d -p 80:5000 todo-app"
+
 
 
